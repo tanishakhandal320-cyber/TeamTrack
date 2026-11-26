@@ -1,0 +1,37 @@
+digraph TeamTrack {
+  graph [rankdir=TB, fontname="Helvetica", nodesep=0.45, ranksep=0.65, pad=0.3, bgcolor="white", dpi=200, compound=true];
+  node  [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=12, color="#087e78", fillcolor="#e8f4f1", margin="0.18,0.10"];
+  edge  [fontname="Helvetica", fontsize=10, color="#18252d", arrowsize=0.8];
+
+  subgraph cluster_user {
+    label="1. PRESENTATION LAYER (Browser)"; labeljust=l; fontsize=13; fontcolor="#002060"; style="rounded,filled"; fillcolor="#f4f8fd"; color="#002060";
+    user [label="Student / Team Member\n(Chrome or any browser)", fillcolor="#ffffff"];
+    pages [label="HTML5 + CSS3 pages\nDashboard  |  Team  |  Task Details"];
+  }
+
+  subgraph cluster_app {
+    label="2. APPLICATION LAYER (Python + Flask)  -  app.py"; labeljust=l; fontsize=13; fontcolor="#002060"; style="rounded,filled"; fillcolor="#f4f8fd"; color="#002060";
+    routes [label="Flask routes\n/   /tasks   /tasks/<id>   /team   /comments"];
+    valid  [label="Validation\ntitle, status, priority,\ndate, assignee, role"];
+    logic  [label="Business logic\nprogress %, overdue check,\nmember filter"];
+    jinja  [label="Jinja2 templates\nbase.html, index.html,\ntask.html, team.html"];
+  }
+
+  subgraph cluster_db {
+    label="3. DATA LAYER (SQLite)  -  teamtrack.db"; labeljust=l; fontsize=13; fontcolor="#002060"; style="rounded,filled"; fillcolor="#f4f8fd"; color="#002060";
+    members  [label="members\nid, name, role", shape=cylinder, fillcolor="#fff4dc", color="#8a6410"];
+    tasks    [label="tasks\nid, title, description, assignee_id,\nstatus, priority, due_date, created_at", shape=cylinder, fillcolor="#fff4dc", color="#8a6410"];
+    comments [label="comments\nid, task_id, author,\nmessage, created_at", shape=cylinder, fillcolor="#fff4dc", color="#8a6410"];
+  }
+
+  user -> pages [dir=both, label=" views / submits forms"];
+  pages -> routes [dir=both, label=" HTTP request (GET / POST)\n HTML response (Jinja2)"];
+  routes -> valid;
+  valid -> logic;
+  logic -> members  [label=" parameterized SQL", dir=both];
+  logic -> tasks    [dir=both];
+  logic -> comments [dir=both];
+  members -> tasks    [label=" assignee_id (FK)", style=dashed, constraint=false, color="#8a6410", fontcolor="#8a6410"];
+  tasks -> comments   [label=" task_id (FK)", style=dashed, constraint=false, color="#8a6410", fontcolor="#8a6410"];
+  logic -> jinja [label=" data for display", constraint=false];
+}
